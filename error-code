@@ -1,0 +1,64 @@
+from requests import get
+from pprint import pprint
+
+server_url = 'https://mobile-phone-server.vercel.app/phones'
+res = get(server_url)
+if res.status_code == 200:
+    data = res.json()
+    all_phones = data.get('RECORDS')
+
+def media_from_url(image_source,phone_name):
+    '''
+    This will return media from URL
+    :return: WP Codes
+    '''
+    codes = f'<!-- wp:image {{"align":"center","sizeSlug":"large"}} -->' \
+            f'<figure class="wp-block-image aligncenter size-large">' \
+            f'<img src="{image_source}" alt="{phone_name}"/><figcaption class="wp-element-caption">{phone_name}</figcaption></figure><!-- /wp:image -->'
+    return codes
+
+
+def dictionary_to_table(dictionary):
+
+    '''
+
+    Converts any dictionary into WP Guttenberg Table code
+
+    :param dictionary: Dictionary name
+    :return: WP Guttenberg Table Code
+    '''
+
+    codes = '<!-- wp:table {"hasFixedLayout":true} --><figure class="wp-block-table"><table class="has-fixed-layout"><tbody>'
+    for key, value in dictionary.items():
+        tr_data = f'<tr><td>{key}</td><td>{value}</td></tr>'
+        codes += tr_data
+    codes += '</tbody></table></figure><!-- /wp:table -->'
+    return codes
+
+def wp_paragraph(paragraph_text):
+
+    '''
+
+    Converts any text into WP Guttenberg paragraph code
+
+    :param paragraph_text: Any text string
+    :return: WP Guttenberg Paragraph Code
+    '''
+
+    codes = f'<!-- wp:paragraph --><p>{paragraph_text}</p><!-- /wp:paragraph -->'
+    return codes
+
+for phone in all_phones:
+    name = phone.get('name').title()
+    released_at = phone.get('released_at').lower().replace('released', '')
+    released_month = released_at.replace(' 2020, ','').title()
+    released_year = released_at.replace(', november 12','')
+    chipset = phone.get('chipset')
+    weight = phone.get('body').replace(', 9.7mm thickness', '')
+    thickness = phone.get('body').replace('177.5g,', '').replace(' thickness','')
+    os = phone.get('os')
+    first_paragraph = f'{name} is released on {released_month},{released_year}. It comes with {chipset} chipset. The weight of this phone is {weight}, and thickness is {thickness}. {os} is the built in android OS. '
+    print(first_paragraph)
+
+
+
